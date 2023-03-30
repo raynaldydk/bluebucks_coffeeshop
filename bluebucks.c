@@ -21,8 +21,12 @@ int contains_author_title(char* word);
 int is_email(char *str);
 void order_drink(long long int phone_num);
 struct node* search(struct node* curr, long long int phone_num);
-void InOrder(struct node* tree);
 int totalNodes(struct node* tree);
+void InOrder(struct node* tree);
+void remove_customer();
+struct node* minValueNode(struct node* node);
+struct node* deleteNode(struct node* root, long long int noHP);
+
 
 int main(){
     long long int phone_num;
@@ -65,6 +69,7 @@ int main(){
                 }
                 break;
             case 3:
+                remove_customer();
                 break;
             default:
                 break;
@@ -272,4 +277,65 @@ void InOrder(struct node* tree){
         printf("--------------------------------------------------------------------------------------\n");
         InOrder(tree->right);
     }
+}
+
+void remove_customer(){
+    long long int phone_num;
+    if(tree == NULL){
+        printf("There is no data !\n");
+        printf("\nPress Enter to continue ...");
+        getchar();
+    }
+    else{
+        printf("Input phone number: ");
+        scanf("%lld", &phone_num);
+        getchar();
+        if(search(tree, phone_num) == NULL){
+            printf("Data invalid!\n");
+            printf("\nPress Enter to continue ...");
+            getchar();
+        }
+        else if(search(tree, phone_num) != NULL){
+            tree = deleteNode(tree, phone_num);
+            printf("Delete success!\n");
+            printf("\nPress Enter to continue ...");
+            getchar();
+        }
+    }
+}
+
+struct node* minValueNode(struct node* node) {
+    struct node* current = node;
+    while (current && current->left != NULL) {
+        current = current->left;
+    }
+    return current;
+}
+
+struct node* deleteNode(struct node* root, long long int noHP) {
+    if (root == NULL) {
+        return root;
+    }
+    if (noHP < root->noHP) {
+        root->left = deleteNode(root->left, noHP);
+    }
+    else if (noHP > root->noHP) {
+        root->right = deleteNode(root->right, noHP);
+    }
+    else {
+        if (root->left == NULL) {
+            struct Node* temp = (struct Node *) root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right == NULL) {
+            struct Node* temp = (struct Node *)root->left;
+            free(root);
+            return temp;
+        }
+        struct node* temp = minValueNode(root->right);
+        root->noHP = temp->noHP;
+        root->right = deleteNode(root->right, temp->noHP);
+    }
+    return root;
 }
