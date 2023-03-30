@@ -2,7 +2,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 
+struct node{
+    long long int noHP;
+    struct node *right;
+    struct node *left;
+};
+
+struct node *createNode(struct node *parent, long long int value);
+void insert(struct node **root, long long int value);
+void inorderTraversal(struct node *tree);
 void order();
 int digits_only(const char *s);
 int contains_author_title(char* word);
@@ -36,14 +46,15 @@ int main(){
 }
 
 void order(){
-    char phone_num[14];
+    long long int phone_num;
     char name[26];
     char email[21];
+    int nDigits;
     do{
         printf("Input phone number[10-13][numeric]: ");
-        scanf("%s", phone_num);
+        scanf("%lld", &phone_num);
         getchar();
-    }while(digits_only(phone_num) != 1 || strlen(phone_num) < 10 || strlen(phone_num) > 13);
+    }while(phone_num < 1000000000 || phone_num > 1000000000000);
 //    check phone number exist or not
 
     do{
@@ -57,17 +68,10 @@ void order(){
         scanf("%s", email);
         getchar();
     }while(!is_email(email));
-    // check email format
+
+    // Insert BST
 
     printf("Insert sucess !\n");
-}
-
-int digits_only(const char *s){
-    while (*s) {
-        if (isdigit(*s++) == 0)
-            return 0;
-    }
-    return 1;
 }
 
 int contains_author_title(char* word){
@@ -75,11 +79,6 @@ int contains_author_title(char* word){
         return 1;
     }
     return 0;
-}
-
-int check_email_length(char* email_address){
-
-    return 1;
 }
 
 int is_email(char *str) {
@@ -126,4 +125,41 @@ int is_email(char *str) {
     }
 
     return 1;
+}
+
+struct node *createNode(struct node *parent, long long int value) {
+    struct node *newNode = malloc(sizeof(struct node));
+    newNode->noHP = value;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+void insert(struct node **root, long long int value){
+    if (*root == NULL) {
+        *root = createNode(NULL, value);
+    } else if (value < (*root)->noHP) {
+        if ((*root)->left == NULL) {
+            struct node *temp = createNode(*root, value);
+            (*root)->left = temp;
+        } else {
+            insert(&((*root)->left), value);
+        }
+    } else if (value > (*root)->noHP) {
+        if ((*root)->right == NULL) {
+            struct node *temp = createNode(*root, value);
+            (*root)->right = temp;
+        } else {
+            insert(&((*root)->right), value);
+        }
+    }
+}
+
+void inorderTraversal(struct node *tree) {
+    if (tree != NULL) {
+        inorderTraversal(tree->left);
+        printf("%lld\n", tree->noHP);
+        inorderTraversal(tree->right);
+    }
+    getchar();
 }
