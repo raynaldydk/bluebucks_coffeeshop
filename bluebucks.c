@@ -21,6 +21,8 @@ int contains_author_title(char* word);
 int is_email(char *str);
 void order_drink();
 struct node* search(struct node* curr, long long int phone_num);
+struct node* deleteNode(struct node* root, long long int phone_num);
+void remove_customer();
 
 int main(){
     long long int phone_num;
@@ -52,6 +54,7 @@ int main(){
             case 2:
                 break;
             case 3:
+                remove_customer();
                 break;
             default:
                 break;
@@ -221,5 +224,84 @@ struct node* search(struct node* curr, long long int phone_num){
     else if(phone_num > curr->noHP){
         return search(curr->right, phone_num);
     }
+}
 
+struct node* minValueNode(struct node* node)
+{
+    struct node* current = node;
+
+    /* loop down to find the leftmost leaf */
+    while (current && current->left != NULL)
+        current = current->left;
+
+    return current;
+}
+
+struct node* deleteNode(struct node* root, long long int phone_num)
+{
+    // base case
+    if (root == NULL)
+        return root;
+
+    // If the key to be deleted
+    // is smaller than the root's
+    // key, then it lies in left subtree
+    if (phone_num < root->noHP)
+        root->left = deleteNode(root->left, phone_num);
+
+        // If the key to be deleted
+        // is greater than the root's
+        // key, then it lies in right subtree
+    else if (phone_num > root->noHP)
+        root->right = deleteNode(root->right, phone_num);
+
+        // if key is same as root's key,
+        // then This is the node
+        // to be deleted
+    else {
+        // node with only one child or no child
+        if (root->left == NULL) {
+            struct node* temp = root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right == NULL) {
+            struct node* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        // node with two children:
+        // Get the inorder successor
+        // (smallest in the right subtree)
+        struct node* temp = minValueNode(root->right);
+
+        // Copy the inorder
+        // successor's content to this node
+        root->noHP = temp->noHP;
+
+        // Delete the inorder successor
+        root->right = deleteNode(root->right, temp->noHP);
+    }
+    return root;
+}
+
+void remove_customer(){
+    long long int phone_num;
+    if(tree == NULL){
+        printf("There is no data!\n");
+        main();
+    }
+    else{
+        printf("Input phone number: ");
+        scanf("%lld", &phone_num);
+        getchar();
+        if(search(tree, phone_num) == NULL){
+            printf("Data invalid!\n");
+        }
+        else{
+            deleteNode(tree, phone_num);
+            printf("Delete success!\n");
+        }
+    }
 }
