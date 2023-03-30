@@ -6,6 +6,7 @@
 void order();
 int digits_only(const char *s);
 int contains_author_title(char* word);
+int is_email(char *str);
 
 int main(){
     int input_main;
@@ -21,7 +22,7 @@ int main(){
         getchar();
         switch(input_main){
             case 1:
-//                order();
+                order();
                 break;
             case 2:
                 break;
@@ -55,7 +56,7 @@ void order(){
         printf("Input email[10-20][email format]: ");
         scanf("%s", email);
         getchar();
-    }while(strlen(email) < 10 || strlen(email) > 20);
+    }while(!is_email(email));
     // check email format
 
     printf("Insert sucess !\n");
@@ -77,16 +78,52 @@ int contains_author_title(char* word){
 }
 
 int check_email_length(char* email_address){
-    if(strlen(email_address) < 10 || strlen(email_address) > 20){
-        return 0;
-    }
+
     return 1;
 }
 
-int check_email_valid(char* email_address){
+int is_email(char *str) {
+    int len = strlen(str);
+    int at_index = -1, dot_index = -1;
 
-    if(check_email_length(email_address)){
-
+    if(strlen(str) < 10 || strlen(str) > 20){
+        return 0;
     }
-    return 0;
+
+    // Find the position of the "@" symbol and the last "."
+    for (int i = 0; i < len; i++) {
+        if (str[i] == '@') {
+            at_index = i;
+        }
+        else if (str[i] == '.') {
+            dot_index = i;
+        }
+    }
+
+    // Check that both the "@" symbol and the last "." are present
+    if (at_index == -1 || dot_index == -1) {
+        return 0;
+    }
+
+    // Check that the "@" symbol comes before the last "."
+    if (at_index > dot_index) {
+        return 0;
+    }
+
+    // Check that there is at least one character before the "@"
+    if (at_index == 0) {
+        return 0;
+    }
+
+    // Check that there is at least one character between the "@" and the last "."
+    if (dot_index - at_index < 2) {
+        return 0;
+    }
+
+    // Check that there is at least one character after the last "."
+    if (len - dot_index <= 1) {
+        return 0;
+    }
+
+    return 1;
 }
