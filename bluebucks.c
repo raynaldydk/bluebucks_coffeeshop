@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
+#include <conio.h>
 
 struct node{
     long long int noHP;
@@ -14,8 +14,8 @@ struct node{
 
 struct node* tree = NULL;
 
-void insert(struct node **root, long long int value, char* name, char* email);
-struct node *createNode(struct node *parent, long long int value, char* name, char* email);
+void insert(struct node **root, long long int value, char* name, char* email, int point);
+struct node *createNode(struct node *parent, long long int value, char* name, char* email, int point);
 void order(long long int phone_num);
 int contains_author_title(char* word);
 int is_email(char *str);
@@ -23,6 +23,8 @@ void order_drink();
 struct node* search(struct node* curr, long long int phone_num);
 struct node* deleteNode(struct node* root, long long int phone_num);
 void remove_customer();
+void InOrder(struct node* tree);
+int totalNodes(struct node* tree);
 
 int main(){
     long long int phone_num;
@@ -52,6 +54,17 @@ int main(){
                 }
                 break;
             case 2:
+                if(totalNodes(tree) == 0){
+                    printf("There is no data !\n");
+                    printf("\nPress Enter to continue...");
+                    getch();
+                    printf("\n");
+                }else{
+                    printf("--------------------------------------------------------------------------------------\n");
+                    printf("| %-26s | %-16s | %-21s | %-10s |\n", "Name", "Phone Number", "Email", "Points");
+                    printf("--------------------------------------------------------------------------------------\n");
+                    InOrder(tree);
+                }
                 break;
             case 3:
                 remove_customer();
@@ -66,6 +79,7 @@ int main(){
 void order(long long int phone_num){
     char name[26];
     char email[21];
+    int point = 10;
     do{
         printf("Input name[5-25][Mr. | Mrs.]: ");
         scanf("%[^\n]", name);
@@ -79,7 +93,7 @@ void order(long long int phone_num){
     }while(!is_email(email));
 
     // Insert BST
-    insert(&tree, phone_num, name, email);
+    insert(&tree, phone_num, name, email, point);
 
     printf("Insert sucess !\n");
 }
@@ -137,32 +151,33 @@ int is_email(char *str) {
     return 1;
 }
 
-struct node *createNode(struct node *parent, long long int value, char* name, char* email) {
+struct node *createNode(struct node *parent, long long int value, char* name, char* email, int point) {
     struct node *newNode = malloc(sizeof(struct node));
     newNode->noHP = value;
     strcpy(newNode->name, name);
     strcpy(newNode->email, email);
+    newNode->point = point;
     newNode->left = NULL;
     newNode->right = NULL;
     return newNode;
 }
 
-void insert(struct node **root, long long int value, char* name, char* email){
+void insert(struct node **root, long long int value, char* name, char* email, int point){
     if (*root == NULL) {
-        *root = createNode(NULL, value, name, email);
+        *root = createNode(NULL, value, name, email, point);
     } else if (value < (*root)->noHP) {
         if ((*root)->left == NULL) {
-            struct node *temp = createNode(*root, value, name, email);
+            struct node *temp = createNode(*root, value, name, email, point);
             (*root)->left = temp;
         } else {
-            insert(&((*root)->left), value, name, email);
+            insert(&((*root)->left), value, name, email, point);
         }
     } else if (value > (*root)->noHP) {
         if ((*root)->right == NULL) {
-            struct node *temp = createNode(*root, value, name, email);
+            struct node *temp = createNode(*root, value, name, email, point);
             (*root)->right = temp;
         } else {
-            insert(&((*root)->right), value, name, email);
+            insert(&((*root)->right), value, name, email, point);
         }
     }
 }
@@ -207,20 +222,20 @@ void order_drink(){
 
 struct node* search(struct node* curr, long long int phone_num){
     if(curr == NULL){
-        return 0;
+        return curr;
     }
 
-    // phone num found
+        // phone num found
     else if(phone_num == curr->noHP){
         return curr;
     }
 
-    // phone->left
+        // phone->left
     else if(phone_num < curr->noHP){
         return search(curr->left, phone_num);
     }
 
-    // phone-right
+        // phone-right
     else if(phone_num > curr->noHP){
         return search(curr->right, phone_num);
     }
@@ -303,5 +318,21 @@ void remove_customer(){
             deleteNode(tree, phone_num);
             printf("Delete success!\n");
         }
+    }
+}
+
+int totalNodes(struct node* tree){
+    if(tree == NULL){
+        return 0;
+    }
+    return (totalNodes(tree->left) + totalNodes(tree->right) + 1);
+}
+
+void InOrder(struct node* tree){
+    if(tree != NULL){
+        InOrder(tree->left);
+        printf("| %-26s | 0%-15lld | %-21s | %-10d |\n", tree->name, tree->noHP, tree->email, tree->point);
+        printf("--------------------------------------------------------------------------------------\n");
+        InOrder(tree->right);
     }
 }
