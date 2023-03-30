@@ -19,7 +19,7 @@ struct node *createNode(struct node *parent, long long int value, char* name, ch
 void order(long long int phone_num);
 int contains_author_title(char* word);
 int is_email(char *str);
-void order_drink();
+void order_drink(long long int phone_num);
 struct node* search(struct node* curr, long long int phone_num);
 void InOrder(struct node* tree);
 int totalNodes(struct node* tree);
@@ -45,7 +45,7 @@ int main(){
                     getchar();
                 }while(phone_num < 1000000000 || phone_num > 1000000000000);
                 if(search(tree, phone_num) != 0){
-                    order_drink();
+                    order_drink(phone_num);
                 }
                 else{
                     order(phone_num);
@@ -179,13 +179,32 @@ void insert(struct node **root, long long int value, char* name, char* email, in
     }
 }
 
-void order_drink(){
+void order_drink(long long int phone_num){
     int i = 0;
     char drink[10][25];
     int qty[i];
     double total;
     char again;
+    char option;
     int point;
+
+    struct node* temp = search(tree, phone_num);
+
+    if(temp->point >= 25){
+        printf("Do you want to use your points[You have %d][y|n]: ", temp->point);
+        scanf("%c", &option);
+        getchar();
+
+        if(option == 'y'){
+            do{
+                printf("How much[%d left]: ", temp->point);
+                scanf("%d", &point);
+                getchar();
+            }while(point % 25 > 0);
+            temp->point -= point;
+            printf("You have %d free drink(s) left.", point/25);
+        }
+    }
 
     do{
         do{
@@ -215,6 +234,7 @@ void order_drink(){
     point = total/50000;
     point = point*3;
     printf("Point Obtained: %d\n", point);
+    temp->point += point;
 }
 
 struct node* search(struct node* curr, long long int phone_num){
