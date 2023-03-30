@@ -16,12 +16,14 @@ struct node* tree = NULL;
 
 void insert(struct node **root, long long int value, char* name, char* email);
 struct node *createNode(struct node *parent, long long int value, char* name, char* email);
-void order();
+void order(long long int phone_num);
 int contains_author_title(char* word);
 int is_email(char *str);
 void order_drink();
+struct node* search(struct node* curr, long long int phone_num);
 
 int main(){
+    long long int phone_num;
     int input_main;
     do{
         printf("BlueBucks\n");
@@ -35,7 +37,17 @@ int main(){
         getchar();
         switch(input_main){
             case 1:
-                order();
+                do{
+                    printf("Input phone number[10-13][numeric]: ");
+                    scanf("%lld", &phone_num);
+                    getchar();
+                }while(phone_num < 1000000000 || phone_num > 1000000000000);
+                if(search(tree, phone_num) != 0){
+                    order_drink();
+                }
+                else{
+                    order(phone_num);
+                }
                 break;
             case 2:
                 break;
@@ -48,17 +60,9 @@ int main(){
     return 0;
 }
 
-void order(){
-    long long int phone_num;
+void order(long long int phone_num){
     char name[26];
     char email[21];
-    do{
-        printf("Input phone number[10-13][numeric]: ");
-        scanf("%lld", &phone_num);
-        getchar();
-    }while(phone_num < 1000000000 || phone_num > 1000000000000);
-//    check phone number exist or not
-
     do{
         printf("Input name[5-25][Mr. | Mrs.]: ");
         scanf("%[^\n]", name);
@@ -196,4 +200,26 @@ void order_drink(){
     point = total/50000;
     point = point*3;
     printf("Point Obtained: %d\n", point);
+}
+
+struct node* search(struct node* curr, long long int phone_num){
+    if(curr == NULL){
+        return 0;
+    }
+
+    // phone num found
+    else if(phone_num == curr->noHP){
+        return curr;
+    }
+
+    // phone->left
+    else if(phone_num < curr->noHP){
+        return search(curr->left, phone_num);
+    }
+
+    // phone-right
+    else if(phone_num > curr->noHP){
+        return search(curr->right, phone_num);
+    }
+
 }
