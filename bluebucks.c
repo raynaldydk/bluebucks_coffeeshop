@@ -2,21 +2,24 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <math.h>
 
 struct node{
     long long int noHP;
+    char name[26];
+    char email[21];
+    int point;
     struct node *right;
     struct node *left;
 };
 
-struct node *createNode(struct node *parent, long long int value);
-void insert(struct node **root, long long int value);
-void inorderTraversal(struct node *tree);
+struct node* tree = NULL;
+
+void insert(struct node **root, long long int value, char* name, char* email);
+struct node *createNode(struct node *parent, long long int value, char* name, char* email);
 void order();
-int digits_only(const char *s);
 int contains_author_title(char* word);
 int is_email(char *str);
+void order_drink();
 
 int main(){
     int input_main;
@@ -49,7 +52,6 @@ void order(){
     long long int phone_num;
     char name[26];
     char email[21];
-    int nDigits;
     do{
         printf("Input phone number[10-13][numeric]: ");
         scanf("%lld", &phone_num);
@@ -70,6 +72,7 @@ void order(){
     }while(!is_email(email));
 
     // Insert BST
+    insert(&tree, phone_num, name, email);
 
     printf("Insert sucess !\n");
 }
@@ -127,39 +130,70 @@ int is_email(char *str) {
     return 1;
 }
 
-struct node *createNode(struct node *parent, long long int value) {
+struct node *createNode(struct node *parent, long long int value, char* name, char* email) {
     struct node *newNode = malloc(sizeof(struct node));
     newNode->noHP = value;
+    strcpy(newNode->name, name);
+    strcpy(newNode->email, email);
     newNode->left = NULL;
     newNode->right = NULL;
     return newNode;
 }
 
-void insert(struct node **root, long long int value){
+void insert(struct node **root, long long int value, char* name, char* email){
     if (*root == NULL) {
-        *root = createNode(NULL, value);
+        *root = createNode(NULL, value, name, email);
     } else if (value < (*root)->noHP) {
         if ((*root)->left == NULL) {
-            struct node *temp = createNode(*root, value);
+            struct node *temp = createNode(*root, value, name, email);
             (*root)->left = temp;
         } else {
-            insert(&((*root)->left), value);
+            insert(&((*root)->left), value, name, email);
         }
     } else if (value > (*root)->noHP) {
         if ((*root)->right == NULL) {
-            struct node *temp = createNode(*root, value);
+            struct node *temp = createNode(*root, value, name, email);
             (*root)->right = temp;
         } else {
-            insert(&((*root)->right), value);
+            insert(&((*root)->right), value, name, email);
         }
     }
 }
 
-void inorderTraversal(struct node *tree) {
-    if (tree != NULL) {
-        inorderTraversal(tree->left);
-        printf("%lld\n", tree->noHP);
-        inorderTraversal(tree->right);
+void order_drink(){
+    int i = 0;
+    char drink[10][25];
+    int qty[i];
+    double total;
+    char again;
+    int point;
+
+    do{
+        do{
+            printf("Input drink[Cafe Latte|Caramel Macchiato|Cappuccino|Cafe Mocha]: ");
+            scanf("%[^\n]", drink[i]);
+            getchar();
+        }while((strcmp(drink[i], "Cafe Latte") != 0) && (strcmp(drink[i], "Caramel Macchiato") != 0) &&
+               (strcmp(drink[i], "Cappuccino") != 0) && (strcmp(drink[i], "Cafe Mocha") != 0));
+
+        do{
+            printf("Input drink quantity[>= 1]: ");
+            scanf("%d", &qty[i]);
+            getchar();
+        }while(qty[i] < 1);
+        i++;
+        printf("Do you want to order more[y|n]: ");
+        scanf("%c", &again);
+        getchar();
+    }while(again != 'n');
+
+    printf("Order Summary:\n");
+    for(int j = 0; j < i; j++){
+        printf("%s\t%dx - %d\n", drink[j], qty[j], qty[j]*30000);
+        total += qty[j]*30000;
     }
-    getchar();
+    printf("Total: %.lf\n", total);
+    point = total/50000;
+    point = point*3;
+    printf("Point Obtained: %d\n", point);
 }
